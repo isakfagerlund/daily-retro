@@ -22,7 +22,7 @@ export default defineConfig({
         short_name: 'Journal',
         description: 'daily-work-journal',
         display: 'standalone',
-        theme_color: '#e7e5e4',
+        theme_color: '#1e40af',
       },
 
       workbox: {

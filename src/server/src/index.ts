@@ -20,22 +20,22 @@ app.get('/', async (c) => {
 });
 
 app.post('/', async (c) => {
-  const { data }: { data: InsertEntries[] } = await c.req.json();
+  const data: InsertEntries = await c.req.json();
   const findEntryOnDay = await db.query.entries.findFirst({
-    where: eq(entries.day, data[0].day),
+    where: eq(entries.day, data.day),
   });
 
   try {
     if (findEntryOnDay) {
       throw new Error('This day already exists');
     }
-    await db.insert(entries).values(data[0]);
+    await db.insert(entries).values(data);
   } catch (error) {
     // @ts-expect-error disable
     return c.json({ message: error?.message }, 400);
   }
 
-  return c.json(data[0]);
+  return c.json(data);
 });
 
 app.put('/', async (c) => {
