@@ -1,6 +1,7 @@
 import { entries } from './schema';
 
 export type Message = {
+  id: string;
   createdAt: string;
   content: string;
 };

@@ -7,7 +7,6 @@ export const getEntries = async () => {
 };
 
 export const updateEntry = async (entry: InsertEntries) => {
-  console.log(entry);
   return await fetch('http://localhost:3000/', {
     method: 'PUT',
     headers: {
