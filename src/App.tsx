@@ -1,18 +1,14 @@
-import PWABadge from './PWABadge.tsx';
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
+import PWABadge from './PWABadge.tsx';
 
 import { Day } from './components/Day.tsx';
 import { getEntriesLocal } from './lib/queries.ts';
 
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: Infinity } },
-});
-
-function App() {
+function App({ queryClient }: { queryClient: QueryClient }) {
   return (
     <div className="bg-blue-800 h-dvh">
       <QueryClientProvider client={queryClient}>

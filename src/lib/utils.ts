@@ -8,6 +8,7 @@ import {
   updateEntry,
 } from './queries';
 import { db } from './db';
+import { queryClient } from '@/main';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -74,4 +75,6 @@ export async function checkForUpdates() {
       }
     }
   }
+
+  queryClient.invalidateQueries({ queryKey: ['entries'] });
 }
