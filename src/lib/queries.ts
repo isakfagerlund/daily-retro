@@ -2,7 +2,7 @@ import { InsertEntries, SelectEntries } from '@/server/src/db/types';
 import { db } from './db';
 
 export const getEntries = async () => {
-  const response = await fetch('http://localhost:3000/');
+  const response = await fetch('/api');
 
   return (await response.json()) as SelectEntries[];
 };
@@ -30,7 +30,7 @@ export const updateEntryLocal = async (entry: SelectEntries) => {
 };
 
 export const updateEntry = async (entry: InsertEntries) => {
-  return await fetch('http://localhost:3000/', {
+  return await fetch('/api', {
     method: 'PUT',
     headers: {
       'Content-type': 'application/json',
@@ -40,7 +40,7 @@ export const updateEntry = async (entry: InsertEntries) => {
 };
 
 export const createEntry = async (entry: InsertEntries) => {
-  return await fetch('http://localhost:3000/', {
+  return await fetch('/api', {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',

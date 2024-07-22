@@ -5,7 +5,7 @@ import { entries } from './db/schema';
 import { eq } from 'drizzle-orm';
 import { InsertEntries } from './db/types';
 
-const app = new Hono();
+const app = new Hono().basePath('/api');
 
 app.use('/*', cors());
 
