@@ -5,10 +5,10 @@ import {
   deleteEntriesLocal,
   getEntries,
   setEntriesLocal,
-  updateEntry,
 } from './queries';
 import { db } from './db';
 import { queryClient } from '@/main';
+import { compareDesc } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,14 +32,29 @@ export async function checkForUpdates() {
   const entries = await getEntries();
   const entriesFromClient = await db.entries.toArray();
 
-  // Check days
-  if (entries.length > entriesFromClient.length) {
+  const latestChangeDb = entries.toSorted((a, b) =>
+    compareDesc(new Date(a.updatedAt), new Date(b.updatedAt))
+  );
+
+  const latestChangeClient = entriesFromClient.toSorted((a, b) =>
+    compareDesc(new Date(a.updatedAt), new Date(b.updatedAt))
+  );
+
+  const dates = [
+    { type: 'db', date: latestChangeDb[0].updatedAt },
+    { type: 'client', date: latestChangeClient[0].updatedAt },
+  ].toSorted((a, b) => compareDesc(a.date, b.date));
+
+  if (dates[0].type === 'db') {
+    console.log('db is most recent');
+    // Check days
     // Delete all before setting the new entries
     await deleteEntriesLocal();
 
     // if there is new update from server add to client db
     await setEntriesLocal(entries);
-  } else if (entries.length < entriesFromClient.length) {
+  } else {
+    console.log('client is most recent');
     // Local db is more up to date
     const entriesToAdd = entriesFromClient.filter(
       (entry) => !entries.some((dbEntry) => dbEntry.id === entry.id)
@@ -53,27 +68,27 @@ export async function checkForUpdates() {
         console.error(error);
       }
     }
-  } else {
-    // Check entries on days
-    for (const entry of entries) {
-      const clientCopy = entriesFromClient.find((e) => e.id === entry.id);
 
-      if (
-        JSON.stringify(entry.messages) !== JSON.stringify(clientCopy?.messages)
-      ) {
-        // Update entry
-        console.log(
-          'updating from local db',
-          entry.messages,
-          clientCopy?.messages
-        );
-        if (clientCopy) {
-          await updateEntry(clientCopy);
-        }
-      } else {
-        console.log('did nothing here');
-      }
-    }
+    // // Check entries on days
+    // for (const entry of entries) {
+    //   const clientCopy = entriesFromClient.find((e) => e.id === entry.id);
+
+    //   if (
+    //     JSON.stringify(entry.messages) !== JSON.stringify(clientCopy?.messages)
+    //   ) {
+    //     // Update entry
+    //     console.log(
+    //       'updating from local db',
+    //       entry.messages,
+    //       clientCopy?.messages
+    //     );
+    //     if (clientCopy) {
+    //       await updateEntry(clientCopy);
+    //     }
+    //   } else {
+    //     console.log('did nothing here');
+    //   }
+    // }
   }
 
   queryClient.invalidateQueries({ queryKey: ['entries'] });

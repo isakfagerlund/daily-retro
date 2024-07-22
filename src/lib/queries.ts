@@ -24,11 +24,17 @@ export const deleteEntriesLocal = async () => {
 };
 
 export const addEntryLocal = async (entry: SelectEntries) => {
-  return await db.entries.add(entry);
+  return await db.entries.add({
+    ...entry,
+    updatedAt: new Date().toISOString(),
+  });
 };
 
 export const updateEntryLocal = async (entry: SelectEntries) => {
-  return await db.entries.update(entry.id, entry);
+  return await db.entries.update(entry.id, {
+    ...entry,
+    updatedAt: new Date().toISOString(),
+  });
 };
 
 export const updateEntry = async (entry: InsertEntries) => {
@@ -37,7 +43,7 @@ export const updateEntry = async (entry: InsertEntries) => {
     headers: {
       'Content-type': 'application/json',
     },
-    body: JSON.stringify(entry),
+    body: JSON.stringify({ ...entry, updatedAt: new Date().toISOString() }),
   });
 };
 
@@ -47,6 +53,6 @@ export const createEntry = async (entry: InsertEntries) => {
     headers: {
       'Content-type': 'application/json',
     },
-    body: JSON.stringify(entry),
+    body: JSON.stringify({ ...entry, updatedAt: new Date().toISOString() }),
   });
 };
