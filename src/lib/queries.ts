@@ -25,6 +25,10 @@ export const addEntryLocal = async (entry: SelectEntries) => {
   return await db.entries.add(entry);
 };
 
+export const updateEntryLocal = async (entry: SelectEntries) => {
+  return await db.entries.update(entry.id, entry);
+};
+
 export const updateEntry = async (entry: InsertEntries) => {
   return await fetch('http://localhost:3000/', {
     method: 'PUT',

@@ -5,6 +5,7 @@ import {
   deleteEntriesLocal,
   getEntries,
   setEntriesLocal,
+  updateEntry,
 } from './queries';
 import { db } from './db';
 
@@ -30,6 +31,7 @@ export async function checkForUpdates() {
   const entries = await getEntries();
   const entriesFromClient = await db.entries.toArray();
 
+  // Check days
   if (entries.length > entriesFromClient.length) {
     // Delete all before setting the new entries
     await deleteEntriesLocal();
@@ -51,6 +53,25 @@ export async function checkForUpdates() {
       }
     }
   } else {
-    console.log('do nothing');
+    // Check entries on days
+    for (const entry of entries) {
+      const clientCopy = entriesFromClient.find((e) => e.id === entry.id);
+
+      if (
+        JSON.stringify(entry.messages) !== JSON.stringify(clientCopy?.messages)
+      ) {
+        // Update entry
+        console.log(
+          'updating from local db',
+          entry.messages,
+          clientCopy?.messages
+        );
+        if (clientCopy) {
+          await updateEntry(clientCopy);
+        }
+      } else {
+        console.log('did nothing here');
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
-import { updateEntry, addEntryLocal } from '@/lib/queries';
-import { InsertEntries, Message, SelectEntries } from '@/server/src/db/types';
+import { addEntryLocal, updateEntryLocal } from '@/lib/queries';
+import { Message, SelectEntries } from '@/server/src/db/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, getYear, subDays } from 'date-fns';
 import { X, MessageCircle, ChevronLeft } from 'lucide-react';
@@ -35,8 +35,8 @@ export const Day = ({ entries }: { entries: SelectEntries[] }) => {
   const queryClient = useQueryClient();
   const [currentDay, setCurrentDay] = useState(today);
   const update = useMutation({
-    mutationFn: (entry: InsertEntries) => {
-      return updateEntry(entry);
+    mutationFn: (entry: SelectEntries) => {
+      return updateEntryLocal(entry);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['entries'] }),
   });
@@ -67,7 +67,7 @@ export const Day = ({ entries }: { entries: SelectEntries[] }) => {
       return;
     }
 
-    const newEntry: InsertEntries = {
+    const newEntry: SelectEntries = {
       id: todaysEntry.id,
       day: todaysEntry.day,
       createdAt: todaysEntry.createdAt,
@@ -87,12 +87,12 @@ export const Day = ({ entries }: { entries: SelectEntries[] }) => {
       (message) => message.id !== id
     );
 
-    const updatedEntry: InsertEntries = {
+    const updatedEntry: SelectEntries = {
       id: todaysEntry.id,
       day: todaysEntry.day,
       createdAt: todaysEntry.createdAt,
       updatedAt: todaysEntry.updatedAt,
-      messages: deletedMessage,
+      messages: deletedMessage ?? null,
     };
 
     update.mutate(updatedEntry);
