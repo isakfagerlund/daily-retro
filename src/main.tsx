@@ -21,7 +21,9 @@ function handleSync() {
 
   window.addEventListener('focus', async () => {
     console.log('Tab is focused again');
-    await checkForUpdates();
+    if (navigator.onLine) {
+      await checkForUpdates();
+    }
   });
 }
 
