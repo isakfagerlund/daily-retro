@@ -5,6 +5,7 @@ import {
   deleteEntriesLocal,
   getEntries,
   setEntriesLocal,
+  updateEntry,
 } from './queries';
 import { db } from './db';
 import { queryClient } from '@/main';
@@ -69,26 +70,26 @@ export async function checkForUpdates() {
       }
     }
 
-    // // Check entries on days
-    // for (const entry of entries) {
-    //   const clientCopy = entriesFromClient.find((e) => e.id === entry.id);
+    // Check entries on days
+    for (const entry of entries) {
+      const clientCopy = entriesFromClient.find((e) => e.id === entry.id);
 
-    //   if (
-    //     JSON.stringify(entry.messages) !== JSON.stringify(clientCopy?.messages)
-    //   ) {
-    //     // Update entry
-    //     console.log(
-    //       'updating from local db',
-    //       entry.messages,
-    //       clientCopy?.messages
-    //     );
-    //     if (clientCopy) {
-    //       await updateEntry(clientCopy);
-    //     }
-    //   } else {
-    //     console.log('did nothing here');
-    //   }
-    // }
+      if (
+        JSON.stringify(entry.messages) !== JSON.stringify(clientCopy?.messages)
+      ) {
+        // Update entry
+        console.log(
+          'updating from local db',
+          entry.messages,
+          clientCopy?.messages
+        );
+        if (clientCopy) {
+          await updateEntry(clientCopy);
+        }
+      } else {
+        console.log('did nothing here');
+      }
+    }
   }
 
   queryClient.invalidateQueries({ queryKey: ['entries'] });
