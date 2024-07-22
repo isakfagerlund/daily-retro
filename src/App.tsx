@@ -5,7 +5,6 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 
-// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Day } from './components/Day.tsx';
 import { getEntriesLocal } from './lib/queries.ts';
 
@@ -18,7 +17,6 @@ function App() {
     <div className="bg-blue-800 h-dvh">
       <QueryClientProvider client={queryClient}>
         <Home />
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
       <PWABadge />
     </div>
