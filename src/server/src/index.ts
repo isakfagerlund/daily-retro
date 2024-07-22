@@ -1,11 +1,18 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { db } from './db';
 import { entries } from './db/schema';
 import { eq } from 'drizzle-orm';
 import { InsertEntries } from './db/types';
+import { createClient } from '@libsql/client';
+import * as schema from './db/schema';
+import { drizzle } from 'drizzle-orm/libsql';
 
-const app = new Hono().basePath('/api');
+export type Env = {
+  TURSO_CONNECTION_URL: string;
+  TURSO_AUTH_TOKEN: string;
+};
+
+const app = new Hono<{ Bindings: Env }>();
 
 app.use('/*', cors());
 
@@ -14,12 +21,26 @@ app.notFound((c) => {
 });
 
 app.get('/', async (c) => {
+  const client = createClient({
+    url: c.env.TURSO_CONNECTION_URL,
+    authToken: c.env.TURSO_AUTH_TOKEN,
+  });
+
+  const db = drizzle(client, { schema });
+
   const allEntries = await db.query.entries.findMany();
 
   return c.json(allEntries, 200);
 });
 
 app.post('/', async (c) => {
+  const client = createClient({
+    url: c.env.TURSO_CONNECTION_URL,
+    authToken: c.env.TURSO_AUTH_TOKEN,
+  });
+
+  const db = drizzle(client, { schema });
+
   const data: InsertEntries = await c.req.json();
   const findEntryOnDay = await db.query.entries.findFirst({
     where: eq(entries.day, data.day),
@@ -39,6 +60,13 @@ app.post('/', async (c) => {
 });
 
 app.put('/', async (c) => {
+  const client = createClient({
+    url: c.env.TURSO_CONNECTION_URL,
+    authToken: c.env.TURSO_AUTH_TOKEN,
+  });
+
+  const db = drizzle(client, { schema });
+
   const data: InsertEntries = await c.req.json();
   console.log(data);
 

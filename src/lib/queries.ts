@@ -1,8 +1,10 @@
 import { InsertEntries, SelectEntries } from '@/server/src/db/types';
 import { db } from './db';
 
+const API_ENDPOINT = 'https://daily-retro-api.fagerlund-isak.workers.dev';
+
 export const getEntries = async () => {
-  const response = await fetch('/api');
+  const response = await fetch(API_ENDPOINT);
 
   return (await response.json()) as SelectEntries[];
 };
@@ -30,7 +32,7 @@ export const updateEntryLocal = async (entry: SelectEntries) => {
 };
 
 export const updateEntry = async (entry: InsertEntries) => {
-  return await fetch('/api', {
+  return await fetch(API_ENDPOINT, {
     method: 'PUT',
     headers: {
       'Content-type': 'application/json',
@@ -40,7 +42,7 @@ export const updateEntry = async (entry: InsertEntries) => {
 };
 
 export const createEntry = async (entry: InsertEntries) => {
-  return await fetch('/api', {
+  return await fetch(API_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
