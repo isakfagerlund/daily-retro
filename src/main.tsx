@@ -5,7 +5,7 @@ import './index.css';
 import { checkForUpdates } from './lib/utils.ts';
 
 function handleSync() {
-  window.addEventListener('load', async () => {
+  window.addEventListener('DOMContentLoaded', async () => {
     await checkForUpdates();
   });
 }
