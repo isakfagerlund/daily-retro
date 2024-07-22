@@ -34,6 +34,10 @@ export const Entry = ({
   return (
     <span
       onTouchEnd={handleTap}
+      onDoubleClick={() => {
+        openDialog();
+        setCurrentOpenMessage(id);
+      }}
       className="p-4 bg-blue-50 text-blue-800 font-bold rounded-xl"
       key={createdAt}
     >

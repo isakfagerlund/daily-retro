@@ -1,4 +1,4 @@
-import { addEntryLocal, updateEntryLocal } from '@/lib/queries';
+import { addEntryLocal, updateEntry, updateEntryLocal } from '@/lib/queries';
 import { Message, SelectEntries } from '@/server/src/db/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, getYear, subDays } from 'date-fns';
@@ -35,7 +35,10 @@ export const Day = ({ entries }: { entries: SelectEntries[] }) => {
   const queryClient = useQueryClient();
   const [currentDay, setCurrentDay] = useState(today);
   const update = useMutation({
-    mutationFn: (entry: SelectEntries) => {
+    mutationFn: async (entry: SelectEntries) => {
+      if (navigator.onLine) {
+        await updateEntry(entry);
+      }
       return updateEntryLocal(entry);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['entries'] }),

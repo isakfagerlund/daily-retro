@@ -5,12 +5,17 @@ import './index.css';
 import { checkForUpdates } from './lib/utils.ts';
 
 import { QueryClient } from '@tanstack/query-core';
-export const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: Infinity } },
-});
+export const queryClient = new QueryClient();
 
 function handleSync() {
   window.addEventListener('DOMContentLoaded', async () => {
+    if (navigator.onLine) {
+      await checkForUpdates();
+    }
+  });
+
+  window.addEventListener('online', async () => {
+    console.log('went online');
     await checkForUpdates();
   });
 }
