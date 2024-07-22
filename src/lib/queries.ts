@@ -16,7 +16,9 @@ export const getEntriesLocal = async () => {
 };
 
 export const setEntriesLocal = async (entries: SelectEntries[]) => {
-  return await db.entries.bulkAdd(entries);
+  return await db.entries.bulkAdd(
+    entries.map((entry) => ({ ...entry, isSynced: true }))
+  );
 };
 
 export const deleteEntriesLocal = async () => {
@@ -27,13 +29,31 @@ export const addEntryLocal = async (entry: SelectEntries) => {
   return await db.entries.add({
     ...entry,
     updatedAt: new Date().toISOString(),
+    isSynced: false,
   });
 };
 
-export const updateEntryLocal = async (entry: SelectEntries) => {
-  return await db.entries.update(entry.id, {
+export const updateEntryLocal = async (
+  entry: SelectEntries,
+  isSynced: boolean
+) => {
+  const newEntry = {
     ...entry,
     updatedAt: new Date().toISOString(),
+  };
+
+  await db.entries.update(entry.id, { ...newEntry, isSynced });
+
+  return newEntry;
+};
+
+export const updateEntrySyncStatus = async (
+  entry: SelectEntries,
+  isSynced: boolean
+) => {
+  return await db.entries.update(entry.id, {
+    ...entry,
+    isSynced,
   });
 };
 
@@ -43,7 +63,7 @@ export const updateEntry = async (entry: InsertEntries) => {
     headers: {
       'Content-type': 'application/json',
     },
-    body: JSON.stringify({ ...entry, updatedAt: new Date().toISOString() }),
+    body: JSON.stringify({ ...entry }),
   });
 };
 
@@ -53,6 +73,6 @@ export const createEntry = async (entry: InsertEntries) => {
     headers: {
       'Content-type': 'application/json',
     },
-    body: JSON.stringify({ ...entry, updatedAt: new Date().toISOString() }),
+    body: JSON.stringify({ ...entry }),
   });
 };

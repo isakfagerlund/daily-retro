@@ -1,15 +1,16 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import {
-  createEntry,
   deleteEntriesLocal,
   getEntries,
   setEntriesLocal,
   updateEntry,
+  updateEntrySyncStatus,
 } from './queries';
 import { db } from './db';
 import { queryClient } from '@/main';
 import { compareDesc } from 'date-fns';
+import { SelectEntries } from '@/server/src/db/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,58 +38,43 @@ export async function checkForUpdates() {
     compareDesc(new Date(a.updatedAt), new Date(b.updatedAt))
   );
 
-  const latestChangeClient = entriesFromClient.toSorted((a, b) =>
+  const latestClientWithoutSyncProperty = entriesFromClient.toSorted((a, b) =>
     compareDesc(new Date(a.updatedAt), new Date(b.updatedAt))
   );
 
+  const latestChangeClient: SelectEntries = {
+    id: latestClientWithoutSyncProperty?.[0]?.id,
+    day: latestClientWithoutSyncProperty?.[0]?.day,
+    createdAt: latestClientWithoutSyncProperty?.[0]?.createdAt,
+    updatedAt: latestClientWithoutSyncProperty?.[0]?.updatedAt,
+    messages: latestClientWithoutSyncProperty?.[0]?.messages,
+  };
+
   const dates = [
-    { type: 'db', date: latestChangeDb[0].updatedAt },
-    { type: 'client', date: latestChangeClient[0].updatedAt },
+    { type: 'db', date: latestChangeDb?.[0]?.updatedAt },
+    { type: 'client', date: latestChangeClient?.updatedAt },
   ].toSorted((a, b) => compareDesc(a.date, b.date));
 
-  if (dates[0].type === 'db') {
+  if (
+    JSON.stringify(latestChangeDb[0]) === JSON.stringify(latestChangeClient)
+  ) {
+    console.log('client and DB is the same, do nothing');
+  } else if (dates[0].type === 'db') {
     console.log('db is most recent');
-    // Check days
-    // Delete all before setting the new entries
     await deleteEntriesLocal();
-
-    // if there is new update from server add to client db
     await setEntriesLocal(entries);
   } else {
     console.log('client is most recent');
-    // Local db is more up to date
-    const entriesToAdd = entriesFromClient.filter(
-      (entry) => !entries.some((dbEntry) => dbEntry.id === entry.id)
+    const unsyncedEntries = entriesFromClient.filter(
+      (entry) => !entry.isSynced
     );
 
-    console.log('Entries to add', entriesToAdd);
-    for (const entry of entriesToAdd) {
-      try {
-        await createEntry(entry);
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    for (const entry of unsyncedEntries) {
+      // Add to database
+      await updateEntry(entry);
 
-    // Check entries on days
-    for (const entry of entries) {
-      const clientCopy = entriesFromClient.find((e) => e.id === entry.id);
-
-      if (
-        JSON.stringify(entry.messages) !== JSON.stringify(clientCopy?.messages)
-      ) {
-        // Update entry
-        console.log(
-          'updating from local db',
-          entry.messages,
-          clientCopy?.messages
-        );
-        if (clientCopy) {
-          await updateEntry(clientCopy);
-        }
-      } else {
-        console.log('did nothing here');
-      }
+      // Set local version to synced
+      await updateEntrySyncStatus(entry, true);
     }
   }
 

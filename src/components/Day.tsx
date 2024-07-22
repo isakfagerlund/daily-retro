@@ -37,9 +37,10 @@ export const Day = ({ entries }: { entries: SelectEntries[] }) => {
   const update = useMutation({
     mutationFn: async (entry: SelectEntries) => {
       if (navigator.onLine) {
-        await updateEntry(entry);
+        const entryWithUpdateDate = await updateEntryLocal(entry, true);
+        return updateEntry(entryWithUpdateDate);
       }
-      return updateEntryLocal(entry);
+      return await updateEntryLocal(entry, false);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['entries'] }),
   });
