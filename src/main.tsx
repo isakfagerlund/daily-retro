@@ -18,6 +18,11 @@ function handleSync() {
     console.log('went online');
     await checkForUpdates();
   });
+
+  window.addEventListener('focus', async () => {
+    console.log('Tab is focused again');
+    await checkForUpdates();
+  });
 }
 
 handleSync();
