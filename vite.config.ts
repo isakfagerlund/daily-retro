@@ -9,33 +9,14 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
-      injectRegister: false,
-
-      pwaAssets: {
-        disabled: false,
-        config: true,
-      },
-
+      strategies: 'injectManifest',
+      srcDir: 'src/service-worker',
+      filename: 'sw.ts',
       manifest: {
-        name: 'daily-work-journal',
-        short_name: 'Journal',
-        description: 'daily-work-journal',
-        display: 'standalone',
         theme_color: '#1e40af',
       },
-
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
-        cleanupOutdatedCaches: true,
-        clientsClaim: true,
-      },
-
       devOptions: {
-        enabled: false,
-        navigateFallback: 'index.html',
-        suppressWarnings: true,
-        type: 'module',
+        enabled: true,
       },
     }),
   ],

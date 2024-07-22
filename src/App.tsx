@@ -7,7 +7,7 @@ import {
 
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Day } from './components/Day.tsx';
-import { getEntries } from './lib/queries.ts';
+import { getEntriesLocal } from './lib/queries.ts';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
@@ -26,7 +26,10 @@ function App() {
 }
 
 const Home = () => {
-  const { data } = useQuery({ queryKey: ['entries'], queryFn: getEntries });
+  const { data } = useQuery({
+    queryKey: ['entries'],
+    queryFn: getEntriesLocal,
+  });
 
   if (!data) {
     return <p>Loading...</p>;
