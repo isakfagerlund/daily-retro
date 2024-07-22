@@ -2,7 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { initSW } from './lib/sw-helpers.ts';
+import { checkForUpdates } from './lib/utils.ts';
+
+function handleSync() {
+  window.addEventListener('load', async () => {
+    await checkForUpdates();
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -10,4 +16,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 );
 
-initSW();
+handleSync();

@@ -9,10 +9,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      strategies: 'injectManifest',
-      srcDir: 'src/service-worker',
-      filename: 'sw.ts',
+      registerType: 'prompt',
       manifest: {
+        name: 'Daily Retro',
+        short_name: 'Daily Retro',
         theme_color: '#1e40af',
       },
       devOptions: {
