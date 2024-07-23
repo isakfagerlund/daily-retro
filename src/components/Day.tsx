@@ -111,12 +111,12 @@ export const Day = ({ entries }: { entries: SelectEntries[] }) => {
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
       >
-        <DrawerContent>
+        <DrawerContent className="h-1/4 lg:container">
           <DrawerHeader>
             <DrawerTitle>Do you want to delete this entry?</DrawerTitle>
             <DrawerDescription>This action cannot be undone.</DrawerDescription>
           </DrawerHeader>
-          <DrawerFooter>
+          <DrawerFooter className="mb-4">
             <Button
               onClick={() => {
                 deleteMessage(currentOpenMessage);
